@@ -38,6 +38,10 @@ public interface Sequence<T> extends Iterable<T> {
         return new Filter<>(this, predicate);
     }
 
+    default <R> FilterMap<T, R> filterMap(Function<T, Option<R>> mapper) {
+        return new FilterMap<>(this, mapper);
+    }
+
     default Enumerate<T> enumerate() {
         return new Enumerate<>(this);
     }
