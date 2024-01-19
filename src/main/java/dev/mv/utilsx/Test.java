@@ -5,7 +5,7 @@ import dev.mv.utilsx.sequence.Sequence;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
+import java.util.Random;
 
 @SuppressWarnings("unchecked")
 public class Test {
@@ -18,8 +18,8 @@ public class Test {
                 .ints()
                 .take(10)
                 .map(x -> (char) (int) x)
-                .fold("", (s, c) -> s + c)
-                .getUnchecked();
+                .collect();
+
         System.out.println(str);
 
         List<List<Integer>> w = Sequence
@@ -31,9 +31,11 @@ public class Test {
                 .map(Arrays::asList)
                 .collect();
 
-        System.out.println(w);
+        //System.out.println(w);
 
         List<Integer> l = Sequence.from(1, 2, 3).cycle().take(10).collect();
-        System.out.println(l);
+        //System.out.println(l);
+
+        Sequence.random().bind(0, 20).ints();
     }
 }

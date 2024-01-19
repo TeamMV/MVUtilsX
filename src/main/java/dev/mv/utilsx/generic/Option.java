@@ -86,4 +86,31 @@ public class Option<T> {
         value = null;
         return Option.some(buffer);
     }
+
+    public Option<T> replace(Option<T> newValue) {
+        Option<T> copy = new Option<>(isSome, value);
+        isSome = newValue.isSome;
+        value = newValue.value;
+        return copy;
+    }
+
+    public <E> Result<T, E> ok_or(E err) {
+        if (isNone()) return Result.err(err);
+        return Result.ok(value);
+    }
+
+    public <E> Result<T, E> ok_or(Supplier<E> err) {
+        if (isNone()) return Result.err(err.get());
+        return Result.ok(value);
+    }
+
+    public <U> Result<U, T> err_or(U ok) {
+        if (isNone()) return Result.ok(ok);
+        return Result.err(value);
+    }
+
+    public <U> Result<U, T> err_or(Supplier<U> ok) {
+        if (isNone()) return Result.ok(ok.get());
+        return Result.err(value);
+    }
 }

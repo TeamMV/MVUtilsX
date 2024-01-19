@@ -2,11 +2,15 @@ package dev.mv.utilsx.sequence;
 
 import dev.mv.utilsx.generic.Option;
 import dev.mv.utilsx.generic.Pair;
+import dev.mv.utilsx.sequence.integer.IntOption;
+import dev.mv.utilsx.sequence.integer.IntSequence;
 
 import java.lang.reflect.Array;
 import java.util.*;
 import java.util.function.*;
 
+@SuppressWarnings("unchecked")
+@FunctionalInterface
 public interface Sequence<T> extends Iterable<T> {
 
     Option<T> next();
@@ -112,6 +116,18 @@ public interface Sequence<T> extends Iterable<T> {
 
     default Cycle<T> cycle() {
         return new Cycle<>(this);
+    }
+
+    default Distinct<T> distinct() {
+        return new Distinct<>(this);
+    }
+
+    default Split<T> split(int workers) {
+        return new Split<>(this, workers);
+    }
+
+    default IntSequence mapToInt(ToIntFunction<T> mapper) {
+        return IntSequence.fromSequence(this, mapper);
     }
 
     @Override
@@ -232,6 +248,11 @@ public interface Sequence<T> extends Iterable<T> {
             }
             return (B) map;
         }
+        else if (clazz.equals(java.lang.CharSequence.class) || clazz.equals(String.class)) {
+            StringBuilder builder = new StringBuilder();
+            for (T value : this) builder.append(value);
+            return (B) builder.toString();
+        }
 
         throw new RuntimeException("Class " + clazz.getName() + " is not collectable from sequence.");
     }
@@ -322,13 +343,13 @@ public interface Sequence<T> extends Iterable<T> {
             return this;
         }
 
-        public Sequence<Integer> ints() {
+        public IntSequence ints() {
             if (!bound) {
-                return () -> Option.some(random.nextInt());
+                return () -> IntOption.some(random.nextInt());
             }
             int lower = (int) this.lowerBound;
             int upper = (int) this.upperBound;
-            return () -> Option.some(random.nextInt(upper - lower) + lower);
+            return () -> IntOption.some(random.nextInt(upper - lower) + lower);
         }
 
         public Sequence<Float> floats() {

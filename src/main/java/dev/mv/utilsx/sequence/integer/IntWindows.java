@@ -1,27 +1,27 @@
-package dev.mv.utilsx.sequence;
+package dev.mv.utilsx.sequence.integer;
 
 import dev.mv.utilsx.generic.Option;
-import dev.mv.utilsx.generic.Pair;
+import dev.mv.utilsx.sequence.Sequence;
 
-import java.lang.reflect.Array;
 import java.util.Arrays;
 
-public class Windows<T> implements Sequence<T[]> {
-    private Sequence<T> parent;
+public class IntWindows implements Sequence<int[]> {
+    private IntSequence parent;
     private int windowSize;
-    private T[] window;
+    private int[] window;
 
-    Windows(Sequence<T> parent, int windowSize) {
+    public IntWindows(IntSequence parent, int windowSize) {
         this.parent = parent;
         this.windowSize = windowSize;
     }
 
-    public Option<T[]> next() {
+    @Override
+    public Option<int[]> next() {
         var next = parent.next();
         if (next.isNone()) return Option.none();
         if (window == null) {
-            T value = next.getUnchecked();
-            window = (T[]) Array.newInstance(value.getClass(), windowSize);
+            int value = next.getUnchecked();
+            window = new int[windowSize];
             window[0] = value;
             for (int i = 1; i < windowSize; i++) {
                 var item = parent.next();
@@ -35,5 +35,4 @@ public class Windows<T> implements Sequence<T[]> {
         }
         return Option.some(Arrays.copyOf(window, windowSize));
     }
-
 }
