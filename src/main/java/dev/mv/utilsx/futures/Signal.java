@@ -1,6 +1,5 @@
-package dev.mv.utilsx.async;
+package dev.mv.utilsx.futures;
 
-import dev.mv.utilsx.futures.*;
 import dev.mv.utilsx.generic.Null;
 
 import java.time.Duration;
@@ -10,10 +9,10 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class Signal implements Wake {
 
-    final Mutex<Boolean> ready = new Mutex<>(false);
-    final CondVar condition = new CondVar(ready);
-    final List<Waker> wakers = new ArrayList<>(1);
-    final AtomicInteger waiting = new AtomicInteger(0);
+    private final Mutex<Boolean> ready = new Mutex<>(false);
+    private final CondVar condition = new CondVar(ready);
+    private final List<Waker> wakers = new ArrayList<>(1);
+    private final AtomicInteger waiting = new AtomicInteger(0);
 
     public boolean ready() {
         return ready.get();
@@ -61,5 +60,29 @@ public class Signal implements Wake {
         wakers.clear();
         condition.signalAll();
         ready.unlock();
+    }
+
+    public static class SignalFuture implements Future<Null> {
+
+        private final Signal signal;
+        private boolean started = false;
+
+        private SignalFuture(Signal signal) {
+            this.signal = signal;
+        }
+
+        @Override
+        public Poll<Null> poll(Context context) {
+            try {
+                signal.ready.lock();
+                if (signal.ready.getLocked()) return new Poll<>(Null.INSTANCE);
+                if (!started) {
+                    signal.wakers.add(context.waker());
+                }
+                return new Poll<>();
+            } finally {
+                signal.ready.unlock();
+            }
+        }
     }
 }
