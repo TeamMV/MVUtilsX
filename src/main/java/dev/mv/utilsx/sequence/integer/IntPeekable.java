@@ -1,10 +1,10 @@
 package dev.mv.utilsx.sequence.integer;
 
-public class IntPeakable implements IntSequence{
+public class IntPeekable implements IntSequence{
     private IntSequence parent;
     private IntOption buffer;
 
-    public IntPeakable(IntSequence parent) {
+    public IntPeekable(IntSequence parent) {
         this.parent = parent;
     }
 

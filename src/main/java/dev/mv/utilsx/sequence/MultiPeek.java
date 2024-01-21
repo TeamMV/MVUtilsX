@@ -1,14 +1,12 @@
 package dev.mv.utilsx.sequence;
 
+import dev.mv.utilsx.collection.Vec;
 import dev.mv.utilsx.generic.Option;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class MultiPeek<T> implements Sequence<T> {
 
     private Sequence<T> parent;
-    private List<T> peeked = new ArrayList<>();
+    private Vec<T> peeked = new Vec<>();
     private int current = 0;
 
     public MultiPeek(Sequence<T> parent) {
@@ -19,19 +17,19 @@ public class MultiPeek<T> implements Sequence<T> {
     public Option<T> next() {
         if (!peeked.isEmpty()) {
             current--;
-            return Option.some(peeked.removeFirst());
+            return Option.some(peeked.popFirst());
         }
         return parent.next();
     }
 
     public Option<T> peek() {
-        if (peeked.size() > current) {
+        if (peeked.len() > current) {
             return Option.some(peeked.get(current++));
         }
         var next = parent.next();
         if (next.isNone()) return Option.none();
         current++;
-        peeked.add(next.getUnchecked());
+        peeked.push(next.getUnchecked());
         return next;
     }
 

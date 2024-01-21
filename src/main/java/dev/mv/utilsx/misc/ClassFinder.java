@@ -1,6 +1,7 @@
 package dev.mv.utilsx.misc;
 
 import dev.mv.utilsx.UtilsX;
+import dev.mv.utilsx.collection.Vec;
 import dev.mv.utilsx.sequence.Sequence;
 
 import java.io.File;
@@ -8,7 +9,9 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.util.*;
+import java.util.Enumeration;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.jar.Attributes;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
@@ -17,11 +20,11 @@ import java.util.jar.Manifest;
 @SuppressWarnings("unchecked")
 public class ClassFinder {
 
-    private static List<String> foundClasses = null;
+    private static Vec<String> foundClasses = null;
 
 
     public static Sequence<String> findAllClasses() {
-        if (foundClasses != null) return Sequence.from(foundClasses);
+        if (foundClasses != null) return foundClasses.iterCopied();
         try {
             Set<File> files = new HashSet<>();
             Set<String> classes = new HashSet<>();
@@ -40,7 +43,7 @@ public class ClassFinder {
             findClasses(files, classes);
             foundClasses = Sequence.from(classes)
                 .filter(name -> !UtilsX.containsAny(name, "module-info", "package-info", "META-INF")).collect();
-            return Sequence.from(foundClasses);
+            return foundClasses.iterCopied();
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

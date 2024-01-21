@@ -234,9 +234,9 @@ public interface Sequence<T> extends Iterable<T> {
             return (B) list;
         }
         else if (clazz.isArray()) {
-            List<T> list = new ArrayList<>();
-            forEach(list::add);
-            return (B) list.toArray((T[]) Array.newInstance(clazz.getComponentType(), list.size()));
+            Vec<T> vec = new Vec<>();
+            forEach(vec::push);
+            return (B) vec.toArray();
         }
         else if (clazz.equals(Vec.class)) {
             Vec<T> vec = new Vec<>();

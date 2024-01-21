@@ -17,12 +17,15 @@ public class Vec<T> implements RandomAccess, Iterable<T> {
     transient T[] elements;
     int length;
 
-    public Vec(T... ignore) {
-        this(0, ignore);
+    public Vec(T... init) {
+        elements = init;
+        length = init.length;
     }
 
-    public Vec(int capacity, T... ignore) {
-        elements = (T[]) Array.newInstance(ignore.getClass().componentType(), capacity);
+    public static <T> Vec<T> withCapacity(int capacity, T... ignore) {
+        Vec<T> vec = new Vec<>();
+        vec.elements = (T[]) Array.newInstance(ignore.getClass().componentType(), capacity);
+        return vec;
     }
 
     private void grow(int minAmount) {
@@ -106,6 +109,20 @@ public class Vec<T> implements RandomAccess, Iterable<T> {
         T element = elements[length];
         elements[length] = null;
         return element;
+    }
+
+    public T popFirst() {
+        if (length == 0) return null;
+        length--;
+        T element = elements[0];
+        System.arraycopy(elements, 1, elements, 0, length);
+        elements[length] = null;
+        return element;
+    }
+
+    public void clear() {
+        elements = Arrays.copyOf(elements, 0);
+        length = 0;
     }
 
     public T get(int index) {

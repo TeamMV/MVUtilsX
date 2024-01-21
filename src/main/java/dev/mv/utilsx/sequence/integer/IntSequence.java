@@ -71,12 +71,12 @@ public interface IntSequence extends Iterable<Integer> {
         return new IntWindows(this, size);
     }
 
-    default IntPeakable peak() {
-        return new IntPeakable(this);
+    default IntPeekable peekable() {
+        return new IntPeekable(this);
     }
 
-    default IntMultiPeak multiPeak() {
-        return new IntMultiPeak(this);
+    default IntMultiPeek multiPeek() {
+        return new IntMultiPeek(this);
     }
 
     default <R> IntMapWhile<R> mapWhile(IntFunction<Option<R>> mapper) {

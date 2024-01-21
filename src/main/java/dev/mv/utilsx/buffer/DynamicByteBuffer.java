@@ -2,6 +2,7 @@ package dev.mv.utilsx.buffer;
 
 import dev.mv.utilsx.ArrayUtils;
 import dev.mv.utilsx.ByteUtils;
+import dev.mv.utilsx.collection.Vec;
 import dev.mv.utilsx.sequence.Sequence;
 
 import java.nio.charset.Charset;
@@ -560,7 +561,7 @@ public class DynamicByteBuffer implements Cloneable {
 
     public byte[][] splitIntoBytes(int amount) {
         DynamicByteBuffer[] parts = splitInto(amount);
-        return Sequence.from(Arrays.asList(parts)).map(DynamicByteBuffer::array).collect();
+        return new Vec<>(parts).iter().map(DynamicByteBuffer::array).collect();
     }
 
     public DynamicByteBuffer merge(DynamicByteBuffer other) {

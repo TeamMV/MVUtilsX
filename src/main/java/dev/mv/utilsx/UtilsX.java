@@ -2,6 +2,7 @@ package dev.mv.utilsx;
 
 import dev.mv.utilsx.check.Match;
 import dev.mv.utilsx.check.MatchReturn;
+import dev.mv.utilsx.collection.Vec;
 import dev.mv.utilsx.generic.Option;
 import dev.mv.utilsx.misc.ClassFinder;
 import dev.mv.utilsx.nullHandler.NullHandler;
@@ -226,6 +227,20 @@ public class UtilsX {
     }
 
     /**
+     * Merge multiple vecs into one vec, returns the merged vec as an {@link Vec}.
+     *
+     * @param vecs The vecs to be merged.
+     * @return {@link Vec} instance with all the merged vecs.
+     */
+    public static <T> Vec<T> merge(Vec<T>... vecs) {
+        Vec<T> mergedVec = new Vec<>();
+        for (Vec<T> vec : vecs) {
+            mergedVec.append(vec);
+        }
+        return mergedVec;
+    }
+
+    /**
      * Creates a null check instance on the object, allowing you to execute certain
      * code only if the object is null and other code only if it is not null.
      *
@@ -391,9 +406,9 @@ public class UtilsX {
      * Get all the classes in the current JVM classPath with a filter on the full name of the class.
      *
      * @param filter the filter, true to add the class, false to not add.
-     * @return a {@link List} with all the classes as {@link Class<?>} objects.
+     * @return a {@link Vec} with all the classes as {@link Class<?>} objects.
      */
-    public static List<Class<?>> getAllClasses(Predicate<String> filter) {
+    public static Vec<Class<?>> getAllClasses(Predicate<String> filter) {
         try {
             ClassLoader loader = ClassLoader.getSystemClassLoader();
             return ClassFinder.findAllClasses().filter(filter).filterMap(name -> {
@@ -486,6 +501,16 @@ public class UtilsX {
      */
     public static <T> T random(List<T> list) {
         return list.get(random.nextInt(list.size()));
+    }
+
+    /**
+     * Returns a random element from the given vec.
+     *
+     * @param vec The vec to get a random element from.
+     * @return A random element from the vec.
+     */
+    public static <T> T random(Vec<T> vec) {
+        return vec.get(random.nextInt(vec.len()));
     }
 
     /**

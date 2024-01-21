@@ -1,17 +1,16 @@
 package dev.mv.utilsx.futures;
 
+import dev.mv.utilsx.collection.Vec;
 import dev.mv.utilsx.generic.Null;
 
 import java.time.Duration;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class Signal implements Wake {
 
     private final Mutex<Boolean> ready = new Mutex<>(false);
     private final CondVar condition = new CondVar(ready);
-    private final List<Waker> wakers = new ArrayList<>(1);
+    private final Vec<Waker> wakers = new Vec<>();
     private final AtomicInteger waiting = new AtomicInteger(0);
 
     public boolean ready() {
@@ -77,7 +76,7 @@ public class Signal implements Wake {
                 signal.ready.lock();
                 if (signal.ready.getLocked()) return new Poll<>(Null.INSTANCE);
                 if (!started) {
-                    signal.wakers.add(context.waker());
+                    signal.wakers.push(context.waker());
                 }
                 return new Poll<>();
             } finally {

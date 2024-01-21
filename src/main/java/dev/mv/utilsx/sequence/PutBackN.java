@@ -1,14 +1,12 @@
 package dev.mv.utilsx.sequence;
 
+import dev.mv.utilsx.collection.Vec;
 import dev.mv.utilsx.generic.Option;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class PutBackN<T> implements Sequence<T> {
 
     private Sequence<T> parent;
-    private List<T> putBack = new ArrayList<>();;
+    private Vec<T> putBack = new Vec<>();;
 
     public PutBackN(Sequence<T> parent) {
         this.parent = parent;
@@ -17,13 +15,13 @@ public class PutBackN<T> implements Sequence<T> {
     @Override
     public Option<T> next() {
         if (!putBack.isEmpty()) {
-            return Option.some(putBack.removeLast());
+            return Option.some(putBack.pop());
         }
         return next();
     }
 
     public void putBack(T value) {
-        putBack.add(value);
+        putBack.push(value);
     }
 
 }

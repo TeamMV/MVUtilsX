@@ -1,28 +1,24 @@
 package dev.mv.utilsx.sequence.integer;
 
-import dev.mv.utilsx.generic.Option;
-import dev.mv.utilsx.sequence.Sequence;
+import dev.mv.utilsx.collection.Vec;
 
-import java.util.ArrayList;
-import java.util.List;
-
-public class IntMultiPeak implements IntSequence{
+public class IntMultiPeek implements IntSequence{
     private IntSequence parent;
-    private List<Integer> peeked = new ArrayList<>();
+    private Vec<Integer> peeked = new Vec<>();
     private int current = 0;
 
-    public IntMultiPeak(IntSequence parent) {
+    public IntMultiPeek(IntSequence parent) {
         this.parent = parent;
     }
 
     public IntOption peek() {
-        if (peeked.size() > current) {
+        if (peeked.len() > current) {
             return IntOption.some(peeked.get(current++));
         }
         var next = parent.next();
         if (next.isNone()) return IntOption.none();
         current++;
-        peeked.add(next.getUnchecked());
+        peeked.push(next.getUnchecked());
         return next;
     }
 
@@ -34,7 +30,7 @@ public class IntMultiPeak implements IntSequence{
     public IntOption next() {
         if (!peeked.isEmpty()) {
             current--;
-            return IntOption.some(peeked.removeFirst());
+            return IntOption.some(peeked.popFirst());
         }
         return parent.next();
     }
