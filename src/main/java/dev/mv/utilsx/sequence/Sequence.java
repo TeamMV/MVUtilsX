@@ -1,9 +1,11 @@
 package dev.mv.utilsx.sequence;
 
+import dev.mv.utilsx.collection.Vec;
 import dev.mv.utilsx.generic.Option;
 import dev.mv.utilsx.generic.Pair;
 import dev.mv.utilsx.sequence.integer.IntOption;
 import dev.mv.utilsx.sequence.integer.IntSequence;
+import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.Array;
 import java.util.*;
@@ -13,6 +15,7 @@ import java.util.function.*;
 @FunctionalInterface
 public interface Sequence<T> extends Iterable<T> {
 
+    @NotNull
     Option<T> next();
 
     @Override
@@ -234,6 +237,11 @@ public interface Sequence<T> extends Iterable<T> {
             List<T> list = new ArrayList<>();
             forEach(list::add);
             return (B) list.toArray((T[]) Array.newInstance(clazz.getComponentType(), list.size()));
+        }
+        else if (clazz.equals(Vec.class)) {
+            Vec<T> vec = new Vec<>();
+            forEach(vec::push);
+            return (B) vec;
         }
         else if (clazz.equals(Set.class) || clazz.equals(HashSet.class)) {
             Set<T> set = new HashSet<>();
