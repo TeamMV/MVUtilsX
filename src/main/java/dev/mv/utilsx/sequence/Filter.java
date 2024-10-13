@@ -15,6 +15,10 @@ public class Filter<T> implements Sequence<T> {
 
     @Override
     public Option<T> next() {
-        return parent.next().filter(predicate);
+        while (true) {
+            Option<T> n = parent.next();
+            if (n.isNone()) return n;
+            if (predicate.test(n.getUnchecked())) return n;
+        }
     }
 }
