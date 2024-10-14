@@ -14,7 +14,7 @@ public class Enumerate<T> implements Sequence<Indexed<T>> {
     @Override
     public Option<Indexed<T>> next() {
         var next = parent.next();
-        if (next().isSome()) {
+        if (next.isSome()) {
             return Option.some(new Indexed<>(i++, next.getUnchecked()));
         }
         return Option.none();
