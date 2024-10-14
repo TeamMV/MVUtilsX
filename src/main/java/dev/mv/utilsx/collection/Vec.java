@@ -12,7 +12,8 @@ import java.util.Iterator;
 import java.util.RandomAccess;
 import java.util.function.Consumer;
 
-public class Vec<T> implements RandomAccess, Iterable<T> {
+@SuppressWarnings("unchecked")
+public class Vec<T> implements RandomAccess, Iterable<T>, IntoSequence<T> {
 
     transient T[] elements;
     int length;
@@ -30,7 +31,7 @@ public class Vec<T> implements RandomAccess, Iterable<T> {
 
     private void grow(int minAmount) {
         if (elements.length < 3) {
-            elements = Arrays.copyOf(elements, Math.max(minAmount + 3, 5));
+            elements = Arrays.copyOf(elements, Math.max(minAmount + elements.length, 5));
             return;
         }
         int initialLength = elements.length;
@@ -59,7 +60,6 @@ public class Vec<T> implements RandomAccess, Iterable<T> {
 
     public void reserveExact(int additional) {
         if (length + additional > elements.length) elements = Arrays.copyOf(elements, length + additional);
-
     }
 
     public void shrinkToFit() {
@@ -67,13 +67,11 @@ public class Vec<T> implements RandomAccess, Iterable<T> {
     }
 
     public void truncate(int length) {
-        if (length < this.length) elements = Arrays.copyOf(elements, length);
-
+        if (length < elements.length) elements = Arrays.copyOf(elements, length);
     }
 
     public void insert(int index, T element) {
         if (length == elements.length) grow(1);
-
 
         if (index < length) {
             System.arraycopy(elements, index, elements, index + 1, length - index);
@@ -90,11 +88,27 @@ public class Vec<T> implements RandomAccess, Iterable<T> {
         elements[index] = element;
     }
 
+    public int indexOf(T element) {
+        for (int i = 0; i < length; i++) {
+            if (element == null) {
+                if (elements[i] == null) return i;
+                continue;
+            }
+            if (element.equals(elements[i])) return i;
+        }
+        return -1;
+    }
+
     public T remove(int index) {
-        if (index >= length) throw new IndexOutOfBoundsException("Index " + index + " is out of bounds for length " + length + "!");
+        if (index >= length || index < 0) throw new IndexOutOfBoundsException("Index " + index + " is out of bounds for length " + length + "!");
         T element = elements[index];
         System.arraycopy(elements, index + 1, elements, index, length - index - 1);
+        length--;
         return element;
+    }
+
+    public T remove(T element) {
+        return remove(indexOf(element));
     }
 
     public void push(T element) {
@@ -152,10 +166,12 @@ public class Vec<T> implements RandomAccess, Iterable<T> {
         return Arrays.copyOf(elements, length);
     }
 
+    @Override
     public Sequence<T> iter() {
         return new Iter(this);
     }
 
+    @Override
     public Sequence<T> iterCopied() {
         return new IterCopied<>(toArray());
     }
@@ -217,6 +233,20 @@ public class Vec<T> implements RandomAccess, Iterable<T> {
             if (i + 1 < length) builder.append(", ");
         }
         builder.append("]");
+        return builder.toString();
+    }
+
+    public String toDebugString() {
+        StringBuilder builder = new StringBuilder("Vec {\n\telements: [");
+        for (int i = 0; i < elements.length; i++) {
+            builder.append(elements[i]);
+            if (i + 1 < elements.length) builder.append(", ");
+        }
+        builder.append("],\n\tcapacity: ");
+        builder.append(elements.length);
+        builder.append(",\n\tlength: ");
+        builder.append(length);
+        builder.append("\n}");
         return builder.toString();
     }
 
