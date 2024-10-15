@@ -88,6 +88,13 @@ public class Vec<T> implements RandomAccess, Iterable<T>, IntoSequence<T> {
         elements[index] = element;
     }
 
+    public T replace(int index, T element) {
+        if (index >= length || index < 0) throw new IndexOutOfBoundsException("Index " + index + " is out of bounds for length " + length + "!");
+        T t = elements[index];
+        elements[index] = element;
+        return t;
+    }
+
     public int indexOf(T element) {
         for (int i = 0; i < length; i++) {
             if (element == null) {
