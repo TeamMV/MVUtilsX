@@ -195,6 +195,16 @@ public interface Sequence<T> extends Iterable<T> {
         return false;
     }
 
+    default boolean forAny(Predicate<T> test) {
+        var n = next();
+        boolean b = false;
+        while (n.isSome()) {
+            if(test.test(n.getUnchecked())) b = true;
+            n = next();
+        }
+        return b;
+    }
+
     default Option<T> find(Predicate<T> test) {
         return filter(test).next();
     }
