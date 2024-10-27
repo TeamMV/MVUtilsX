@@ -115,7 +115,9 @@ public class Vec<T> implements RandomAccess, Iterable<T>, IntoSequence<T> {
     }
 
     public T remove(T element) {
-        return remove(indexOf(element));
+        int i = indexOf(element);
+        if (i < 0) return null;
+        return remove(i);
     }
 
     public void push(T element) {
