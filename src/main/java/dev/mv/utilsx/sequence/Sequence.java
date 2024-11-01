@@ -161,10 +161,10 @@ public interface Sequence<T> extends Iterable<T> {
         return Option.none();
     }
 
-    default <U> Option<U> fold(U start, BiFunction<U, T, U> accumulator) {
+    default <U> U fold(U start, BiFunction<U, T, U> accumulator) {
         U combined = start;
         var e = next();
-        if (e.isNone()) return Option.some(start);
+        if (e.isNone()) return start;
         T t = e.getUnchecked();
         combined = accumulator.apply(combined, t);
         while (e.isSome()) {
@@ -174,7 +174,7 @@ public interface Sequence<T> extends Iterable<T> {
                 combined = accumulator.apply(combined, t);
             }
         }
-        return Option.some(combined);
+        return combined;
     }
 
     default boolean all(Predicate<T> test) {
