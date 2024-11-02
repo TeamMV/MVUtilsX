@@ -1,5 +1,6 @@
 package dev.mv.utilsx.sequence;
 
+import dev.mv.utilsx.collection.IntoSequence;
 import dev.mv.utilsx.collection.Vec;
 import dev.mv.utilsx.generic.Option;
 import dev.mv.utilsx.generic.Pair;
@@ -47,6 +48,10 @@ public interface Sequence<T> extends Iterable<T> {
 
     default <R> FilterMap<T, R> filterMap(Function<T, Option<R>> mapper) {
         return new FilterMap<>(this, mapper);
+    }
+
+    default <R> FlatMap<T, R> flatMap(Function<T, IntoSequence<R>> mapper) {
+        return new FlatMap<>(this, mapper);
     }
 
     default Enumerate<T> enumerate() {
