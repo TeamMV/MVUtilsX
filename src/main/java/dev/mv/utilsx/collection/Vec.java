@@ -5,15 +5,14 @@ import dev.mv.utilsx.generic.Option;
 import dev.mv.utilsx.sequence.Sequence;
 import org.jetbrains.annotations.NotNull;
 
+import java.io.*;
 import java.lang.reflect.Array;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.RandomAccess;
+import java.util.*;
 import java.util.function.Consumer;
+import java.util.stream.Collector;
 
 @SuppressWarnings("unchecked")
-public class Vec<T> implements RandomAccess, Iterable<T>, IntoSequence<T> {
+public class Vec<T> implements RandomAccess, Iterable<T>, IntoSequence<T>, Serializable {
 
     transient T[] elements;
     int length;
@@ -245,6 +244,45 @@ public class Vec<T> implements RandomAccess, Iterable<T>, IntoSequence<T> {
         return builder.toString();
     }
 
+    @Serial
+    private void writeObject(ObjectOutputStream s) throws java.io.IOException {
+        // TODO: concurrent modification detection
+        // int expectedModCount = modCount;
+        s.defaultWriteObject();
+        s.writeInt(length);
+
+        // Write out all elements in the proper order.
+        for (int i = 0; i < length; i++) {
+            s.writeObject(elements[i]);
+        }
+
+        // throw new ConcurrentModificationException();
+    }
+
+    private static <T> T[] gen(int length, T... ignore) {
+        return (T[]) Array.newInstance(ignore.getClass().componentType(), length);
+    }
+
+    @Serial
+    private void readObject(ObjectInputStream s) throws IOException, ClassNotFoundException {
+        s.defaultReadObject();
+        s.readInt();
+
+        if (length > 0) {
+            T[] elements = gen(length);
+
+            for (int i = 0; i < length; i++) {
+                elements[i] = (T) s.readObject();
+            }
+
+            this.elements = elements;
+        } else if (length == 0) {
+            elements = gen(0);
+        } else {
+            throw new InvalidObjectException("Invalid length: " + length);
+        }
+    }
+
     public String toDebugString() {
         StringBuilder builder = new StringBuilder("Vec {\n\telements: [");
         for (int i = 0; i < elements.length; i++) {
@@ -257,6 +295,13 @@ public class Vec<T> implements RandomAccess, Iterable<T>, IntoSequence<T> {
         builder.append(length);
         builder.append("\n}");
         return builder.toString();
+    }
+
+    public static <T> Collector<T, Vec<T>, Vec<T>> collector() {
+        return Collector.of(Vec::new, Vec::push, (a, b) -> {
+            a.append(b);
+            return a;
+        }, Collector.Characteristics.IDENTITY_FINISH);
     }
 
     public static class Iter<T> implements Sequence<T> {
